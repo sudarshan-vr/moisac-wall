@@ -3,19 +3,19 @@ const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
+const os = require('os');
 
 const app = express();
+const uploadDir = path.join(os.tmpdir(), 'uploads');
 
-// Enable CORS
-app.use(cors());
+// Ensure upload directory exists
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-// Configure multer for file uploads
+// Configure multer to use the temporary directory
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, '..', 'public', 'uploads');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
@@ -27,7 +27,7 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png|gif/;
+        const filetypes = /jpe?g|png|gif/i;
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = filetypes.test(file.mimetype);
         
@@ -37,51 +37,51 @@ const upload = multer({
             cb(new Error('Only image files are allowed (jpeg, jpg, png, gif)'));
         }
     }
-}).single('photo');
+});
+
+// Enable CORS
+app.use(cors());
+app.use(express.json());
 
 // Upload endpoint
-app.post('/api/upload', (req, res) => {
-    upload(req, res, (err) => {
-        if (err) {
-            console.error('Upload error:', err);
-            return res.status(400).json({ error: err.message || 'Error uploading file' });
-        }
-        
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
-        }
+app.post('/api/upload', upload.single('photo'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
 
-        const imageUrl = `/uploads/${req.file.filename}`;
-        res.json({ 
-            success: true, 
-            imageUrl,
-            message: 'File uploaded successfully'
-        });
+    // In a real app, you would upload to cloud storage here
+    // For now, we'll just return the file info
+    res.json({ 
+        success: true, 
+        imageUrl: `/api/images/${path.basename(req.file.filename)}`,
+        message: 'File uploaded successfully'
     });
 });
 
-// Get all images
+// Serve uploaded images
+app.get('/api/images/:filename', (req, res) => {
+    const filePath = path.join(uploadDir, req.params.filename);
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404).json({ error: 'Image not found' });
+    }
+});
+
+// Get list of images
 app.get('/api/images', (req, res) => {
-    const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
-    
-    fs.readdir(uploadsDir, (err, files) => {
+    fs.readdir(uploadDir, (err, files) => {
         if (err) {
-            // If uploads directory doesn't exist, return empty array
-            if (err.code === 'ENOENT') {
-                return res.json([]);
-            }
             console.error('Error reading uploads directory:', err);
-            return res.status(500).json({ error: 'Error reading images' });
+            return res.json([]);
         }
 
         const images = files
             .filter(file => /\.(jpe?g|png|gif)$/i.test(file))
             .map(file => ({
-                url: `/uploads/${file}`,
-                name: file,
-                uploaded: fs.statSync(path.join(uploadsDir, file)).mtime
-            }))
-            .sort((a, b) => b.uploaded - a.uploaded);
+                url: `/api/images/${file}`,
+                name: file
+            }));
 
         res.json(images);
     });
@@ -95,7 +95,7 @@ app.get('/api/health', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
+    res.status(500).json({ error: err.message || 'Something went wrong!' });
 });
 
 module.exports = app;
