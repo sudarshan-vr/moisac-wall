@@ -21,6 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Start the camera
+    async function loadImages() {
+        try {
+            const response = await fetch(`${window.location.origin}/api/images`);
+            const data = await response.json();
+            console.log(data);
+        } catch (err) {
+            console.error('Error loading images:', err);
+        }
+    }
+
     async function startCamera() {
         try {
             stream = await navigator.mediaDevices.getUserMedia({
@@ -147,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
             
-            const response = await fetch('/upload', {
+            const response = await fetch(`${window.location.origin}/api/upload`, {
                 method: 'POST',
                 body: formData,
                 signal: controller.signal
@@ -174,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Redirect to dashboard after a short delay
             setTimeout(() => {
-                window.location.href = '/dashboard';
+                window.location.href = `${window.location.origin}/dashboard`;
             }, 1500);
             
         } catch (err) {
