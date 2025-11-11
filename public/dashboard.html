@@ -116,28 +116,44 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             aspect-ratio: 1;
             background: white;
-            padding: 12px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            border: 3px solid #1a3a6a;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mosaic-item::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px dashed rgba(26, 58, 106, 0.3);
+            border-radius: 10px;
+            pointer-events: none;
         }
 
         .mosaic-item::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 2px solid transparent;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) border-box;
-            -webkit-mask: 
-                linear-gradient(#fff 0 0) padding-box, 
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: destination-out;
-            mask: 
-                linear-gradient(#fff 0 0) padding-box, 
-                linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            pointer-events: none;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, #1a3a6a, #2c5a9c, #3a7bd5, #00d2ff);
+            background-size: 300% 300%;
+            border-radius: 18px;
+            z-index: -1;
+            animation: gradientBG 8s ease infinite;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .mosaic-item:hover {
@@ -265,12 +281,190 @@
                 font-size: 1.8rem;
             }
         }
+        /* FIFA World Cup Theme Elements */
+        .soccer-field {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #1a3a6a 0%, #2c5a9c 100%);
+            overflow: hidden;
+        }
+
+        .corner-flag {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            z-index: 1;
+        }
+
+        .top-left {
+            top: 20px;
+            left: 20px;
+        }
+
+        .top-right {
+            top: 20px;
+            right: 20px;
+            transform: scaleX(-1);
+        }
+
+        .flag-pole {
+            position: absolute;
+            width: 4px;
+            height: 60px;
+            background: #fff;
+            top: 0;
+            left: 0;
+            z-index: 2;
+        }
+
+        .flag {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 30px 40px;
+            border-color: transparent transparent transparent #e30613;
+            top: 0;
+            left: 4px;
+            z-index: 1;
+        }
+
+        .flag-pattern {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background: #fff;
+            top: 5px;
+            left: -35px;
+            transform: rotate(-15deg);
+        }
+
+        .soccer-ball {
+            position: fixed;
+            font-size: 30px;
+            animation: float 8s ease-in-out infinite;
+            opacity: 0.8;
+        }
+
+        .trophy {
+            position: fixed;
+            font-size: 40px;
+            bottom: 30px;
+            right: 30px;
+            animation: bounce 2s ease-in-out infinite;
+            transform-origin: bottom;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .whistle {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            width: 60px;
+            height: 30px;
+            background: #f5f5f5;
+            border-radius: 15px 15px 5px 5px;
+            transform: rotate(-20deg);
+            animation: toot 15s infinite;
+        }
+
+        .whistle-body {
+            position: absolute;
+            width: 40px;
+            height: 15px;
+            background: #e0e0e0;
+            top: 0;
+            left: 0;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .whistle-mouthpiece {
+            position: absolute;
+            width: 10px;
+            height: 8px;
+            background: #c0c0c0;
+            top: 4px;
+            left: 35px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+
+        @keyframes toot {
+            0%, 95%, 100% { transform: rotate(-20deg); }
+            97% { transform: rotate(-15deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .corner-flag {
+                width: 30px;
+                height: 45px;
+            }
+            
+            .flag {
+                border-width: 0 0 22px 30px;
+            }
+            
+            .flag-pattern {
+                width: 22px;
+                height: 15px;
+                top: 4px;
+                left: -26px;
+            }
+            
+            .trophy {
+                font-size: 30px;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .whistle {
+                width: 45px;
+                height: 22px;
+                bottom: 30px;
+                left: 30px;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="soccer-field">
+        <div class="corner-flag top-left">
+            <div class="flag">
+                <div class="flag-pattern"></div>
+            </div>
+            <div class="flag-pole"></div>
+        </div>
+        <div class="corner-flag top-right">
+            <div class="flag">
+                <div class="flag-pattern"></div>
+            </div>
+            <div class="flag-pole"></div>
+        </div>
+        <div class="soccer-ball">⚽</div>
+        <div class="trophy">🏆</div>
+        <div class="whistle">
+            <div class="whistle-body"></div>
+            <div class="whistle-mouthpiece"></div>
+        </div>
+    </div>
+    
     <header>
-        <h1>Mosaic Wall</h1>
-        <p class="subtitle">Viewing all shared moments</p>
+        <h1>FIFA World Cup 2026</h1>
+        <p class="subtitle">Your moments from the greatest show on earth</p>
         <a href="/" class="back-link"><i class="fas fa-camera"></i> Back to Camera</a>
     </header>
 
