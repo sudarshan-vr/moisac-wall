@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mosaic Wall - Gallery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary-color: #6c63ff;
+            --secondary-color: #4a45b1;
+            --accent-color: #ff6b6b;
+            --background-start: #f8f9ff;
+            --background-end: #eef2ff;
+            --text-color: #2d3436;
+            --text-light: #636e72;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        header {
+            text-align: center;
+            margin: 0 auto 30px;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            max-width: 1000px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--primary-color); /* Fallback for browsers that don't support text-fill-color */
+            display: inline-block;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+            text-decoration: none;
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        .mosaic {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .mosaic-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            aspect-ratio: 1;
+            background: white;
+            padding: 12px;
+        }
+
+        .mosaic-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) border-box;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) padding-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask: 
+                linear-gradient(#fff 0 0) padding-box, 
+                linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .mosaic-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .mosaic-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 8px;
+            transition: transform 0.5s ease;
+        }
+
+        .mosaic-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 0%, var(--primary-color) 100%);
+            position: relative;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner::before {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            grid-column: 1 / -1;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .empty-state h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        .empty-state p {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .empty-state a {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .empty-state a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+        }
+
+        .empty-state a i {
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .mosaic {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .empty-state {
+                padding: 40px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mosaic {
+                grid-template-columns: 1fr;
+                max-width: 350px;
+                margin: 0 auto;
+            }
+
+            header {
+                padding: 25px 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mosaic Wall</h1>
+        <p class="subtitle">Viewing all shared moments</p>
+        <a href="/" class="back-link"><i class="fas fa-camera"></i> Back to Camera</a>
+    </header>
+
+    <div id="mosaic" class="mosaic">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading images...</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const mosaic = document.getElementById('mosaic');
+            
+            try {
+                const response = await fetch('/api/images');
+                if (!response.ok) {
+                    throw new Error('Failed to load images');
+                }
+                
+                const images = await response.json();
+                
+                if (images.length === 0) {
+                    mosaic.innerHTML = `
+                        <div class="empty-state">
+                            <h2>No photos yet</h2>
+                            <p>Be the first to share your moment and start the mosaic!</p>
+                            <a href="/"><i class="fas fa-camera"></i> Take a Photo</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Clear loading state
+                mosaic.innerHTML = '';
+                
+                // Add images to mosaic
+                images.forEach(image => {
+                    const item = document.createElement('div');
+                    item.className = 'mosaic-item';
+                    item.innerHTML = `
+                        <img src="${image.url}" alt="Mosaic image" loading="lazy" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23f0f2f5%22%2F%3E%3Ctext%20x%3D%22100%22%20y%3D%22110%22%20font-family%3D%22Arial%22%20font-size%3D%2216%22%20text-anchor%3D%22middle%22%20fill%3D%22%236c757d%22%3EImage%20not%20found%3C%2Ftext%3E%3C%2Fsvg%3E'">
+                    `;
+                    mosaic.appendChild(item);
+                });
+                
+            } catch (error) {
+                console.error('Error loading images:', error);
+                mosaic.innerHTML = `
+                    <div class="empty-state">
+                        <h2>Error loading images</h2>
+                        <p>${error.message}</p>
+                        <a href="/">Back to Camera</a>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
